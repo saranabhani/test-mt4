@@ -1,0 +1,52 @@
+//+------------------------------------------------------------------+
+//|                                                    MovingAverageCrossAlert.mq4|
+//|                        Copyright 2024, MetaQuotes Software Corp.|
+//|                                       http://www.metaquotes.net/|
+//+------------------------------------------------------------------+
+#property copyright "2024 Your Name or Company"
+#property link      "http://www.yourwebsite.com"
+#property version   "1.00"
+#property indicator_chart_window
+
+// Parameters for the moving averages
+input int fastMA = 10; // Period for the fast moving average
+input int slowMA = 20; // Period for the slow moving average
+input int MA_shift = 0; // Shift for the moving averages
+input ENUM_MA_METHOD MA_method = MODE_SMA; // Type of moving average (SMA, EMA, SMMA, LWMA)
+input ENUM_APPLIED_PRICE applied_price = PRICE_CLOSE; // Applied price (close, open, high, low, etc.)
+
+double fastMAValuePrev, slowMAValuePrev;
+
+//+------------------------------------------------------------------+
+//| Expert initialization function                                   |
+//+------------------------------------------------------------------+
+int OnInit()
+  {
+    return(INIT_SUCCEEDED);
+  }
+//+------------------------------------------------------------------+
+//| Expert deinitialization function                                 |
+//+------------------------------------------------------------------+
+void OnDeinit(const int reason)
+  {
+    // Cleanup code here if needed
+  }
+//+------------------------------------------------------------------+
+//| Expert tick function                                             |
+//+------------------------------------------------------------------+
+void OnTick()
+  {
+    double fastMAValue = iMA(NULL, 0, fastMA, MA_shift, MA_method, applied_price, 0);
+    double slowMAValue = iMA(NULL, 0, slowMA, MA_shift, MA_method, applied_price, 0);
+
+    // Alert conditions
+    if (fastMAValuePrev < slowMAValuePrev && fastMAValue > slowMAValue)
+        Alert("Cross Over Alert: Fast MA crossed above Slow MA at price ", Close[0]);
+    else if (fastMAValuePrev > slowMAValuePrev && fastMAValue < slowMAValue)
+        Alert("Cross Under Alert: Fast MA crossed below Slow MA at price ", Close[0]);
+
+    // Update previous values
+    fastMAValuePrev = fastMAValue;
+    slowMAValuePrev = slowMAValue;
+  }
+//+------------------------------------------------------------------+
